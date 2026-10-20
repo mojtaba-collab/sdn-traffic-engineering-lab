@@ -1,4 +1,3 @@
-```markdown
 # Cache Pollution & Dynamic Path Redirection in OpenFlow Networks
 
 This repository contains Mininet topology scripts, OpenFlow 1.3 flow-table configuration tools, and automated Python benchmarking suites used to evaluate end-to-end round-trip latency, Open vSwitch (OVS) software classifier lookup degradation under flow-table saturation attacks, and autonomous threshold-triggered dynamic path redirection under link congestion.
@@ -8,38 +7,38 @@ This repository contains Mininet topology scripts, OpenFlow 1.3 flow-table confi
 ## Network Architecture & Topologies
 
 The testbed uses a 6-switch SDN topology (`s1` through `s6`) connecting four hosts (`h1` to `h4`) with uniform link constraints:
-* **Link Bandwidth ($B$):** $10.0\text{ Mbps}$
-* **Propagation Delay ($d$):** $5.0\text{ ms}$ per link
-* **Queue Limit ($q$):** $100\text{ packets}$
-
-
+- **Link Bandwidth (B):** 10.0 Mbps
+- **Propagation Delay (d):** 5.0 ms per link
+- **Queue Limit (q):** 100 packets
 
 ### Forwarding Path Matrix
 
 | Path Designation | Endpoints & Role | Switch Sequence | Links / Theoretical Minimum RTT |
 | :--- | :--- | :--- | :--- |
-| **Path $p_1$** | $H1 \leftrightarrow H4$ (Primary) | $h1 \leftrightarrow s1 \leftrightarrow s2 \leftrightarrow s3 \leftrightarrow s4 \leftrightarrow h4$ | 5 links (4 switches) $\rightarrow 50.0\text{ ms}$ |
-| **Path $p_2$** | $H2 \leftrightarrow H3$ (Cross-Traffic) | $h2 \leftrightarrow s2 \leftrightarrow s3 \leftrightarrow h3$ | 3 links (2 switches) $\rightarrow 30.0\text{ ms}$ |
-| **Path $p_3$** | $H1 \leftrightarrow H4$ (Bypass) | $h1 \leftrightarrow s1 \leftrightarrow s5 \leftrightarrow s6 \leftrightarrow s4 \leftrightarrow h4$ | 5 links (4 switches) $\rightarrow 50.0\text{ ms}$ |
+| **Path p1** | H1 <-> H4 (Primary) | h1 <-> s1 <-> s2 <-> s3 <-> s4 <-> h4 | 5 links (4 switches) -> 50.0 ms |
+| **Path p2** | H2 <-> H3 (Cross-Traffic) | h2 <-> s2 <-> s3 <-> h3 | 3 links (2 switches) -> 30.0 ms |
+| **Path p3** | H1 <-> H4 (Bypass) | h1 <-> s1 <-> s5 <-> s6 <-> s4 <-> h4 | 5 links (4 switches) -> 50.0 ms |
 
 ---
 
 ## Experimental Phases
 
 ### Phase 1: Baseline Bottleneck Latency (Plot 1)
-* Sweeps UDP traffic injection rates $\lambda_{14}$ from $1.0\text{ Mbps}$ to $9.6\text{ Mbps}$ along Path $p_1$.
-* Tracks baseline propagation delay ($50.3\text{--}50.5\text{ ms}$) and queue saturation knee dynamics ($150.3\text{ ms}$ at $9.6\text{ Mbps}$).
+- Sweeps UDP traffic injection rates (lambda_14) from 1.0 Mbps to 9.6 Mbps along Path p1.
+- Tracks baseline propagation delay (50.3 - 50.5 ms) and queue saturation knee dynamics (150.3 ms at 9.6 Mbps).
 
 ### Phase 2: Flow-Table Pollution Attack (Plot 2)
-* Populates ingress switch `s1` with 3,000+ wildcard OpenFlow rules across destination Layer-4 ports (1000–4000).
-* Uses dynamic UDP probes to induce a 100% miss rate in the OVS Exact Match Cache (EMC), forcing userspace classifier evaluations and producing a steady $+6.35\text{ ms}$ lookup penalty.
+- Populates ingress switch `s1` with 3,000+ wildcard OpenFlow rules across destination Layer-4 ports (1000–4000).
+- Uses dynamic UDP probes to induce a 100% miss rate in the OVS Exact Match Cache (EMC), forcing userspace classifier evaluations and producing a steady +6.35 ms lookup penalty.
 
 ### Phase 3: Dynamic Congestion Rerouting (Plot 3)
-* Maintains a continuous $5.0\text{ Mbps}$ stream on Path $p_1$ ($H1 \rightarrow H4$).
-* Injects $7.0\text{ Mbps}$ cross-traffic on Path $p_2$ ($H2 \rightarrow H3$), overloading the shared $s2\text{--}s3$ link ($12.0\text{ Mbps} > 10.0\text{ Mbps}$) and spiking latency to $166.0\text{ ms}$.
-* Detects when latency doubles ($\ge 102.64\text{ ms}$) and automatically executes `route_p3.sh` to install high-priority rules (`priority=200`), restoring latency to $\approx 51.4\text{ ms}$.
+- Maintains a continuous 5.0 Mbps stream on Path p1 (H1 -> H4).
+- Injects 7.0 Mbps cross-traffic on Path p2 (H2 -> H3), overloading the shared s2-s3 link (12.0 Mbps > 10.0 Mbps) and spiking latency to 166.0 ms.
+- Detects when latency doubles (>= 102.64 ms) and automatically executes `route_p3.sh` to install high-priority rules (priority=200), restoring latency to ~51.4 ms.
 
 ---
+
+
 
 ## Repository Structure
 
